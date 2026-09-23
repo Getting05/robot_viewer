@@ -433,6 +433,7 @@ export class PointerJointDragControls extends JointDragControls {
         };
 
         this._mouseDown = e => {
+            if (this.measurementActive) return;
             if (e.button !== 0) return;
             updateMouse(e);
             raycaster.setFromCamera(mouse, this.camera);
@@ -504,12 +505,14 @@ export class PointerJointDragControls extends JointDragControls {
         };
 
         this._mouseMove = e => {
+            if (this.measurementActive) return;
             updateMouse(e);
             raycaster.setFromCamera(mouse, this.camera);
             this.moveRay(raycaster.ray);
         };
 
         this._mouseUp = e => {
+            if (this.measurementActive) return;
             if (e.button !== 0) return;
             updateMouse(e);
             raycaster.setFromCamera(mouse, this.camera);

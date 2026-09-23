@@ -1,0 +1,14 @@
+<mujoco model="measurement_fixture">
+  <worldbody>
+    <body name="base" pos="0 0 0.2">
+      <inertial pos="0.05 0 0.03" mass="2" diaginertia="0.01 0.01 0.01"/>
+      <geom rgba="0.65 0.75 0.85 1" type="box" size="0.2 0.2 0.1"/>
+      <geom name="base_collision" type="box" size="0.21 0.21 0.11"/>
+      <body name="arm" pos="0 0 0.2">
+        <joint name="hinge" type="hinge" axis="0 1 0" range="-90 90"/>
+        <inertial pos="0 0 0.4" mass="1" diaginertia="0.01 0.01 0.01"/>
+        <geom rgba="0.65 0.75 0.85 1" type="box" pos="0 0 0.4" size="0.06 0.06 0.4"/>
+      </body>
+    </body>
+  </worldbody>
+</mujoco>

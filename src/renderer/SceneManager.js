@@ -134,6 +134,7 @@ export class SceneManager {
             return false;
         }
         // Render immediately (for scenes requiring immediate update)
+        this.measurementController?.refresh();
         this.renderer.render(this.scene, this.camera);
         this._dirty = false;
         return true;
@@ -295,6 +296,7 @@ export class SceneManager {
         }
 
         this.currentModel = null;
+        this.measurementController?.refresh();
     }
 
     // ==================== Environment & Camera ====================

@@ -359,6 +359,8 @@ class App {
 
         // Check if USD WASM model
         if (model?.userData?.isUSDWASM) {
+            if (this.sceneManager.currentModel) this.sceneManager.removeModel(this.sceneManager.currentModel);
+            this.measurementController?.setActive(false);
             // Hide Three.js canvas, show USD viewer
             const canvas = document.getElementById('canvas');
             const usdContainer = document.getElementById('usd-viewer-container');
@@ -608,6 +610,7 @@ class App {
         }, true);
 
         canvas.addEventListener('mouseup', (event) => {
+            if (this.measurementController?.active) return;
             if (event.button !== 0 || !this.sceneManager || !mouseDownPos) return;
 
             const dx = event.clientX - mouseDownPos.x;

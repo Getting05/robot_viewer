@@ -1,0 +1,27 @@
+#measurement-panel, #link-origin-info {
+    position: absolute; right: 16px; top: 76px; width: 310px; max-height: calc(100% - 100px);
+    overflow: auto; z-index: 110; padding: 16px; border: 1px solid var(--border-color, #526071);
+    border-radius: 12px; background: var(--bg-primary, #202631); color: var(--text-primary, #e6edf5);
+    box-shadow: 0 8px 30px #0005; font: 12px/1.5 system-ui;
+}
+#measurement-panel[hidden], #link-origin-info[hidden] { display: none; }
+#measurement-panel header, .measure-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+#measurement-panel header { font-size: 15px; font-weight: 600; }
+#measurement-panel button, #measurement-panel select, #measurement-panel input[type=number], #link-origin-info button {
+    border: 1px solid var(--border-color, #526071); border-radius: 5px; padding: 5px 7px;
+    background: var(--glass-bg, #293342); color: inherit;
+}
+#measurement-panel button { cursor: pointer; }
+#measurement-panel button.active { outline: 2px solid #66b5ff; }
+#measurement-panel fieldset { min-width: 0; border: 1px solid var(--border-color, #526071); border-radius: 7px; margin: 10px 0; }
+.measure-coordinates { display: flex; gap: 8px; margin-bottom: 8px; }
+.measure-coordinates label { flex: 1; min-width: 0; }
+.measure-coordinates input { width: 100%; box-sizing: border-box; }
+.measure-snap { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 8px 0; }
+#measurement-panel output { display: block; white-space: pre-line; font-family: monospace; background: #80808018; padding: 8px; border-radius: 6px; }
+#measurement-panel [data-role=error] { color: #ff8585; }
+.measure-hint { opacity: .7; }
+#link-origin-info { left: 16px; right: auto; top: auto; bottom: 50px; width: 345px; }
+#link-origin-info pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+#link-origin-info button { float: right; cursor: pointer; }
+#measure-tooltip { position: fixed; pointer-events: none; z-index: 150; padding: 5px 9px; border-radius: 5px; background: #101722ee; color: #fff; font: 12px system-ui; }

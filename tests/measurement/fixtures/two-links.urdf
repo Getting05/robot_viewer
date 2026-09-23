@@ -1,0 +1,11 @@
+<robot name="measurement_fixture">
+  <link name="base">
+    <visual><geometry><box size="0.4 0.4 0.2"/></geometry></visual>
+    <inertial><origin xyz="0.05 0 0.03"/><mass value="2"/><inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <link name="arm">
+    <visual><origin xyz="0 0 0.4"/><geometry><box size="0.12 0.12 0.8"/></geometry></visual>
+    <inertial><origin xyz="0 0 0.4"/><mass value="1"/><inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/></inertial>
+  </link>
+  <joint name="hinge" type="revolute"><parent link="base"/><child link="arm"/><origin xyz="0 0 0.2"/><axis xyz="0 1 0"/><limit lower="-2" upper="2" effort="10" velocity="2"/></joint>
+</robot>
