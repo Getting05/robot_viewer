@@ -18,18 +18,18 @@ export class InertialVisualization {
      * @param {number} radius - Radius of COM marker
      * @returns {THREE.Group} COM marker group
      */
-    static createCOMGeometry(radius) {
+    static createCOMGeometry(radius, colors = [0xffffff, 0x000000]) {
         const comGroup = new THREE.Group();
         const segments = 16;
 
         const comMaterialWhite = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
+            color: colors[0],
             side: THREE.DoubleSide,
             depthTest: true,
             depthWrite: true
         });
         const comMaterialBlack = new THREE.MeshBasicMaterial({
-            color: 0x000000,
+            color: colors[1],
             side: THREE.DoubleSide,
             depthTest: true,
             depthWrite: true

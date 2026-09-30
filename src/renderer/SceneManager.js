@@ -136,6 +136,7 @@ export class SceneManager {
         // Render immediately (for scenes requiring immediate update)
         this.measurementController?.refresh();
         this.renderer.render(this.scene, this.camera);
+        this.viewCube?.render();
         this._dirty = false;
         return true;
     }
@@ -907,7 +908,7 @@ export class SceneManager {
         const isSingleMesh = !this.currentModel || !this.currentModel.joints || this.currentModel.joints.size === 0;
 
         this.visualizationManager.updateVisualTransparency(
-            this.inertialVisualization.showCOM,
+            this.inertialVisualization.showCOM || !!this.measurementController?.origins,
             this.axesManager.showAxesEnabled,
             this.axesManager.showJointAxesEnabled,
             isSingleMesh

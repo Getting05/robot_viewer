@@ -1,0 +1,49 @@
+#view-cube {
+    position: fixed;
+    top: 80px;
+    right: 400px;
+    z-index: 70;
+    width: 144px;
+    padding: 8px;
+    text-align: center;
+    color: var(--text-secondary);
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 0.5px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    user-select: none;
+}
+#view-cube[hidden] { display: none; }
+.view-cube-title { font-size: 11px; color: var(--text-tertiary); }
+.view-cube-viewport { width: 128px; height: 128px; touch-action: none; cursor: grab; }
+.view-cube-viewport:active { cursor: grabbing; }
+.view-cube-face {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: #343438;
+    border: 1px solid var(--glass-border);
+    border-radius: 3px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    cursor: pointer;
+}
+.view-cube-face small { font-size: 10px; font-weight: 400; opacity: .65; }
+[data-theme="light"] .view-cube-face { background: #eeeeef; }
+.view-cube-face:hover, .view-cube-face.active, .view-cube-face:focus-visible {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent-hover);
+    outline: none;
+}
+@media (max-width: 1000px) { #view-cube { right: 20px; } }

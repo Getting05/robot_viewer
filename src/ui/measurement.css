@@ -1,27 +1,64 @@
-#measurement-panel, #link-origin-info {
-    position: absolute; right: 16px; top: 76px; width: 310px; max-height: calc(100% - 100px);
-    overflow: auto; z-index: 110; padding: 16px; border: 1px solid var(--border-color, #526071);
-    border-radius: 12px; background: var(--bg-primary, #202631); color: var(--text-primary, #e6edf5);
-    box-shadow: 0 8px 30px #0005; font: 12px/1.5 system-ui;
+/* Reuse the viewer's floating-panel, control-button, control-bar-select,
+   joint-control and joint-value-input styles. Only feature layout lives here. */
+#measurement-panel {
+    top: 80px;
+    right: 20px;
+    width: 360px;
+    max-height: calc(100vh - 100px);
+}
+#link-origin-info {
+    left: 20px;
+    bottom: 50px;
+    width: 360px;
+    max-height: calc(100vh - 100px);
 }
 #measurement-panel[hidden], #link-origin-info[hidden] { display: none; }
-#measurement-panel header, .measure-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-#measurement-panel header { font-size: 15px; font-weight: 600; }
-#measurement-panel button, #measurement-panel select, #measurement-panel input[type=number], #link-origin-info button {
-    border: 1px solid var(--border-color, #526071); border-radius: 5px; padding: 5px 7px;
-    background: var(--glass-bg, #293342); color: inherit;
+#measurement-panel.maximized, #link-origin-info.maximized {
+    top: 80px !important;
+    bottom: auto !important;
+    height: calc(100vh - 100px) !important;
+    transform: none !important;
 }
-#measurement-panel button { cursor: pointer; }
-#measurement-panel button.active { outline: 2px solid #66b5ff; }
-#measurement-panel fieldset { min-width: 0; border: 1px solid var(--border-color, #526071); border-radius: 7px; margin: 10px 0; }
-.measure-coordinates { display: flex; gap: 8px; margin-bottom: 8px; }
-.measure-coordinates label { flex: 1; min-width: 0; }
-.measure-coordinates input { width: 100%; box-sizing: border-box; }
-.measure-snap { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 8px 0; }
-#measurement-panel output { display: block; white-space: pre-line; font-family: monospace; background: #80808018; padding: 8px; border-radius: 6px; }
-#measurement-panel [data-role=error] { color: #ff8585; }
-.measure-hint { opacity: .7; }
-#link-origin-info { left: 16px; right: auto; top: auto; bottom: 50px; width: 345px; }
-#link-origin-info pre { white-space: pre-wrap; overflow-wrap: anywhere; }
-#link-origin-info button { float: right; cursor: pointer; }
-#measure-tooltip { position: fixed; pointer-events: none; z-index: 150; padding: 5px 9px; border-radius: 5px; background: #101722ee; color: #fff; font: 12px system-ui; }
+.measurement-panel .floating-panel-header { padding-right: 76px; }
+.measure-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+.measure-content > * { flex-shrink: 0; }
+.measure-row, .measure-info-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.measure-row > label { display: flex; align-items: center; gap: 4px; min-width: 0; }
+.measure-hint { color: var(--text-tertiary); line-height: 1.5; overflow-wrap: anywhere; }
+.measure-endpoint { gap: 8px; padding: 8px; }
+.measure-binding { min-width: 0; color: var(--text-tertiary); overflow-wrap: anywhere; text-align: right; }
+.measure-coordinates { display: flex; gap: 8px; }
+.measure-coordinates label { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; color: var(--text-tertiary); }
+.measure-coordinates .joint-value-input { width: 100%; min-width: 0; }
+.measure-endpoint-actions { display: flex; justify-content: flex-end; margin-top: 8px; }
+.measure-snap { display: flex; flex-wrap: wrap; gap: 6px; }
+.measure-snap-toggle { position: relative; display: inline-flex; align-items: center; }
+.measure-snap-toggle input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.measure-snap-toggle:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.measure-result { white-space: pre-line; font-variant-numeric: tabular-nums; line-height: 1.8; color: var(--text-primary); }
+.measurement-panel [data-role=error] { color: var(--text-secondary); }
+.measurement-panel [data-role=error]:empty { display: none; }
+.measure-info-row { align-items: baseline; font-variant-numeric: tabular-nums; gap: 12px; }
+.measure-info-row > span:first-child { flex-shrink: 0; color: var(--text-tertiary); }
+.measure-info-row > span:last-child { text-align: right; min-width: 0; overflow-wrap: anywhere; }
+#measure-tooltip {
+    position: fixed;
+    pointer-events: none;
+    z-index: 150;
+    padding: 6px 10px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    border: 0.5px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 11px;
+}

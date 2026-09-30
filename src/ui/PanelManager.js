@@ -17,6 +17,16 @@ export class PanelManager {
         this.modelGraphView = modelGraphView;
     }
 
+    bringToFront(panel) {
+        const allPanels = document.querySelectorAll('.floating-panel, #code-editor-panel');
+        let maxZIndex = 50;
+        allPanels.forEach(other => {
+            const z = parseInt(window.getComputedStyle(other).zIndex) || 50;
+            if (other !== panel) maxZIndex = Math.max(maxZIndex, z);
+        });
+        panel.style.zIndex = maxZIndex + 1;
+    }
+
     /**
      * Register panel
      */
@@ -47,19 +57,7 @@ export class PanelManager {
         const resizeBorderWidth = 12;
 
         // Bring to front
-        const bringToFront = () => {
-            const allPanels = document.querySelectorAll('.floating-panel, #code-editor-panel');
-            let maxZIndex = 50;
-
-            allPanels.forEach(p => {
-                const z = parseInt(window.getComputedStyle(p).zIndex) || 50;
-                if (z > maxZIndex && p !== panel) {
-                    maxZIndex = z;
-                }
-            });
-
-            panel.style.zIndex = maxZIndex + 1;
-        };
+        const bringToFront = () => this.bringToFront(panel);
 
         // Mouse move to detect edges
         panel.addEventListener('mousemove', (e) => {
@@ -272,9 +270,9 @@ export class PanelManager {
      * Setup maximize buttons (common functionality)
      * Automatically find all buttons with panel-maximize-btn class and bind events
      */
-    setupMaximizeButtons() {
+    setupMaximizeButtons(root = document) {
         // Find all maximize buttons
-        const maximizeButtons = document.querySelectorAll('.panel-maximize-btn');
+        const maximizeButtons = root.querySelectorAll('.panel-maximize-btn');
 
         maximizeButtons.forEach(button => {
             // Get panel ID from data-panel-id attribute

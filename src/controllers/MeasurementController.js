@@ -1,18 +1,19 @@
 import * as THREE from 'three';
 import { TransformControls } from 'three/addons/controls/TransformControls.js';
+import { InertialVisualization } from '../renderer/InertialVisualization.js';
 import { MeasurementPanel } from '../ui/MeasurementPanel.js';
 import { i18n } from '../utils/i18n.js';
 import { frameOf, toFrame, fromFrame, measure, resolvePoint, freePoint, parseCoordinates, onAxis, visibleObject, specialPoints } from '../utils/MeasurementMath.js';
 
 export class MeasurementController {
-    constructor(sceneManager) {
+    constructor(sceneManager, panelManager = null) {
         this.sceneManager = sceneManager;
         this.points = [null, null]; this.selectedObjects = [];
         this.active = false; this.selected = 0; this.frameMode = 'world';
         this.unit = 'mm'; this.axis = 'all'; this.reference = null;
         this.snap = { enabled: true, link: true, joint: true, com: true, projection: true };
         this.model = null; this.origins = false; this.originMarkers = new Map();
-        this.panel = new MeasurementPanel(this);
+        this.panel = new MeasurementPanel(this, panelManager);
         this.proxy = new THREE.Object3D(); sceneManager.scene.add(this.proxy);
         this.transform = new TransformControls(sceneManager.camera, sceneManager.canvas);
         this.transform.setMode('translate'); this.transform.setSpace('local'); this.transform.setSize(0.75);
@@ -72,13 +73,17 @@ export class MeasurementController {
         this.resetting = true;
         this.clearMeasurement();
         this.resetting = false; this.infoLink = null; this.panel.info.hidden = true;
-        this.originMarkers.forEach(marker => { marker.material.dispose(); marker.removeFromParent(); }); this.originMarkers.clear();
+        this.originMarkers.forEach(marker => {
+            const materials = new Set();
+            marker.traverse(child => { child.geometry?.dispose(); if (child.material) materials.add(child.material); });
+            materials.forEach(material => material.dispose()); marker.removeFromParent();
+        }); this.originMarkers.clear();
         this.model = model;
         this.modelScale = Math.max(0.001, model?.threeObject ? this.sceneManager.getModelBoundingBox(model.threeObject).getSize(new THREE.Vector3()).length() : 1);
         this.special = specialPoints(model);
         for (const point of this.special.filter(point => point.kind === 'link')) {
-            const marker = new THREE.Sprite(new THREE.SpriteMaterial({ color: 0x55dbed, depthTest: false }));
-            marker.renderOrder = 980; marker.userData.point = point;
+            const marker = InertialVisualization.createCOMGeometry(0.02, [0xfff4df, 0xf59e0b]);
+            marker.userData.point = point; marker.userData.isLinkOrigin = true;
             this.originMarkers.set(point.name, marker); this.sceneManager.scene.add(marker);
         }
     }
@@ -86,7 +91,8 @@ export class MeasurementController {
         const canvas = this.sceneManager.canvas;
         document.getElementById('show-link-origins').onclick = event => {
             this.origins = !this.origins; event.currentTarget.classList.toggle('active', this.origins);
-            event.currentTarget.setAttribute('aria-pressed', String(this.origins)); this.refresh();
+            event.currentTarget.setAttribute('aria-pressed', String(this.origins));
+            this.sceneManager.updateVisualTransparency(); this.refresh();
         };
         document.getElementById('measure-tool').onclick = () => this.setActive(!this.active);
         canvas.addEventListener('pointerdown', event => {
@@ -156,7 +162,7 @@ export class MeasurementController {
         if (!active && this.dragging) this.cancelDrag();
         this.active = active && this.supported();
         if (!this.active) { this.preview.visible = false; this.tooltip.hidden = true; }
-        this.panel.element.hidden = !active;
+        this.panel.show(this.panel.element, active);
         document.getElementById('measure-tool').classList.toggle('active', this.active);
         document.getElementById('measure-tool').setAttribute('aria-pressed', String(this.active));
         this.refresh();
@@ -247,11 +253,13 @@ export class MeasurementController {
         const sm = this.sceneManager, supported = this.supported();
         this.originMarkers.forEach(marker => {
             marker.visible = this.origins && supported;
-            if (marker.visible) marker.position.copy(resolvePoint(marker.userData.point, sm.groundPlane));
+            if (marker.visible) {
+                marker.position.copy(resolvePoint(marker.userData.point, sm.groundPlane));
+                marker.userData.point.object.getWorldQuaternion(marker.quaternion);
+            }
         });
         const height = sm.canvas.clientHeight || 1;
         const size = point => sm.camera.isPerspectiveCamera ? Math.max(0.001, point.distanceTo(sm.camera.position)) * 2 * Math.tan(THREE.MathUtils.degToRad(sm.camera.fov / 2)) / height : (sm.camera.top - sm.camera.bottom) / sm.camera.zoom / height;
-        this.originMarkers.forEach(marker => marker.scale.setScalar(size(marker.position) * 10));
         if (this.preview.visible && this.hoverPoint) this.preview.position.copy(resolvePoint(this.hoverPoint, sm.groundPlane));
         this.preview.scale.setScalar(size(this.preview.position) * 13);
         sm.measurementManager.updateScale(sm.camera, height);
@@ -259,7 +267,7 @@ export class MeasurementController {
     }
     updateInfo() {
         const link = this.infoLink;
-        this.panel.info.hidden = !link || !this.supported();
+        this.panel.show(this.panel.info, !!link && this.supported());
         if (!link || !this.supported()) return;
         const joint = [...this.model.joints.values()].find(joint => joint.child === link.name);
         let parent = joint ? this.model.links.get(joint.parent) : null;
@@ -269,7 +277,10 @@ export class MeasurementController {
         const rotation = relative.rotation.clone().invert().multiply(world.rotation);
         const rpy = new THREE.Euler().setFromQuaternion(rotation, 'XYZ');
         const format = vector => vector.toArray().slice(0, 3).map(value => Number(value).toFixed(5)).join(', ');
-        this.panel.info.querySelector('pre').textContent = `Link: ${link.name}\n${i18n.t('measureParentJoint')}: ${joint?.name || '—'}\n${i18n.t('measureParentLink')}: ${parent?.name || i18n.t('measureRoot')}\n${i18n.t('measureWorld')} XYZ (m):\n${format(world.origin)}\n${i18n.t('measureRelative')} XYZ (m):\n${format(xyz)}\n${i18n.t('measureRelative')} RPY XYZ (rad):\n${format(rpy)}`;
+        this.panel.setLinkInfo({
+            name: link.name, joint: joint?.name || '—', parent: parent?.name || i18n.t('measureRoot'),
+            world: format(world.origin), xyz: format(xyz), rpy: format(rpy)
+        });
     }
     updateMeasurement() { this.refresh(); }
     handleSelection(object, element, type) {
@@ -285,7 +296,7 @@ export class MeasurementController {
         });
         this.selectedObjects.forEach((item, i) => { if (item.name === 'ground' && this.points[1-i]) this.points[i] = { kind: 'projection', name: 'ground', source: this.points[1-i] }; });
         this.reference = this.points[0]?.link?.threeObject || null; this.frameMode = 'world';
-        this.panel.element.hidden = false; this.refresh();
+        this.panel.show(this.panel.element, true); this.refresh();
     }
     clearMeasurement() {
         this.points = [null, null]; this.selectedObjects = []; this.reference = null; this.frameMode = 'world'; this.selected = 0;

@@ -1,3 +1,4 @@
+import { ViewCube } from './renderer/ViewCube.js';
 /**
  * Application main entry point
  * Integrates all modules
@@ -122,6 +123,7 @@ class App {
             }
 
             this.sceneManager = new SceneManager(canvas);
+            this.sceneManager.viewCube = new ViewCube(this.sceneManager);
             window.sceneManager = this.sceneManager; // For debugging
 
             this.poseController = new PoseController(this.sceneManager);
@@ -262,7 +264,11 @@ class App {
             };
 
             // Initialize measurement controller
-            this.measurementController = new MeasurementController(this.sceneManager);
+            this.measurementController = new MeasurementController(this.sceneManager, this.panelManager);
+            for (const panel of [this.measurementController.panel.element, this.measurementController.panel.info]) {
+                this.panelManager.registerPanel(panel.id);
+                this.panelManager.setupMaximizeButtons(panel);
+            }
 
             // Associate measurement controller with model graph view
             if (this.modelGraphView) {

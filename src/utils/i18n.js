@@ -7,6 +7,15 @@ const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '
 
 export const translations = {
     'zh-CN': {
+        "viewCube": "世界视角",
+        "viewIso": "等轴测",
+        "view_front": "前",
+        "view_back": "后",
+        "view_left": "左",
+        "view_right": "右",
+        "view_top": "顶",
+        "view_bottom": "底",
+        'measureMaximize': '最大化 / 还原',
         "measurement": "测距",
         "measureOrigins": "Link 原点",
         "measureClose": "关闭测距",
@@ -217,6 +226,15 @@ export const translations = {
         'fileType': '文件类型'
     },
     'en-US': {
+        "viewCube": "World view",
+        "viewIso": "Isometric",
+        "view_front": "Front",
+        "view_back": "Back",
+        "view_left": "Left",
+        "view_right": "Right",
+        "view_top": "Top",
+        "view_bottom": "Bottom",
+        'measureMaximize': 'Maximize / Restore',
         "measurement": "Measure",
         "measureOrigins": "Link origins",
         "measureClose": "Close measurement",
